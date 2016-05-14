@@ -3,7 +3,6 @@ var React = require('react');
 module.exports = React.createClass({
 	render: function () {
 		var bodyStyle = {
-			height: '100%',
 			width: '100%',
 			margin: '0',
 			overflow: 'hidden',
@@ -16,7 +15,7 @@ module.exports = React.createClass({
 			    <title>btkCalendar</title>
 			  </head>
 			  <body style={bodyStyle}>
-			    <div id="appContainer" dangerouslySetInnerHTML={{__html: this.props.content}} />
+			    <div id="appContainer" style={{height: '100%'}} dangerouslySetInnerHTML={{__html: this.props.content}} />
 			    <script src="client/browser.js"></script>
 			  </body>
 			</html>

@@ -3,7 +3,6 @@ var React = require('react');
 module.exports = React.createClass({
 	render: function () {
 		var bodyStyle = {
-			height: '100%',
 			width: '100%',
 			margin: '0',
 			overflow: 'hidden',
@@ -25,7 +24,7 @@ module.exports = React.createClass({
 			React.createElement(
 				'body',
 				{ style: bodyStyle },
-				React.createElement('div', { id: 'appContainer', dangerouslySetInnerHTML: { __html: this.props.content } }),
+				React.createElement('div', { id: 'appContainer', style: { height: '100%' }, dangerouslySetInnerHTML: { __html: this.props.content } }),
 				React.createElement('script', { src: 'client/browser.js' })
 			)
 		);

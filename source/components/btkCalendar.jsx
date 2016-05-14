@@ -1,7 +1,90 @@
 var React = require('react'),
 		ReactDOM = require('react-dom');
 
+var AddEventPopup = React.createClass ({
+	getInitialState: function () {
+		return {
+			style: {
+				position: 'absolute',
+				width: '600px',
+				height: '480px'
+			}
+		}
+	},
+	render: function () {
+		return
+	}
+});
 
+var Timeline = React.createClass({
+	getInitialState: function () {
+    return {
+    	style: {
+    		position: 'absolute',
+    		left: '0',
+    		top: '0',
+    		width: '60px',
+    		overflow: 'hidden',
+    		backgroundColor: '#ddd'
+
+    	},
+    	hourStyle: {
+    		height: '40px',
+    		textAlign: 'center',
+    		lineHeight: '60px',	// Kostyli
+    		borderBottom: 'solid 2px #ccc'
+    	}
+    }
+	},
+
+	render: function () {
+		return <div style={this.state.style}>
+					 	<div style={this.state.hourStyle}>01:00</div>
+					 	<div style={this.state.hourStyle}>02:00</div>
+					 	<div style={this.state.hourStyle}>03:00</div>
+					 	<div style={this.state.hourStyle}>04:00</div>
+					 	<div style={this.state.hourStyle}>05:00</div>
+					 	<div style={this.state.hourStyle}>06:00</div>
+					 	<div style={this.state.hourStyle}>07:00</div>
+					 	<div style={this.state.hourStyle}>08:00</div>
+					 	<div style={this.state.hourStyle}>09:00</div>
+					 	<div style={this.state.hourStyle}>10:00</div>
+					 	<div style={this.state.hourStyle}>11:00</div>
+					 	<div style={this.state.hourStyle}>12:00</div>
+					 	<div style={this.state.hourStyle}>13:00</div>
+					 	<div style={this.state.hourStyle}>14:00</div>
+					 	<div style={this.state.hourStyle}>15:00</div>
+					 	<div style={this.state.hourStyle}>16:00</div>
+					 	<div style={this.state.hourStyle}>17:00</div>
+					 	<div style={this.state.hourStyle}>18:00</div>
+					 	<div style={this.state.hourStyle}>19:00</div>
+					 	<div style={this.state.hourStyle}>20:00</div>
+					 	<div style={this.state.hourStyle}>21:00</div>
+					 	<div style={this.state.hourStyle}>22:00</div>
+					 	<div style={this.state.hourStyle}>23:00</div>
+					 	<div style={this.state.hourStyle}>24:00</div>
+					 </div>
+	}
+});
+
+var Workspace = React.createClass({
+	getInitialState: function () {
+		return {
+			style: {
+				position: 'relative',
+				height: '100%',
+				backgroundColor: '#fcfcfc',
+				overflowY: 'scroll'
+			}
+		}
+	},
+
+	render: function () {
+		return	<div style={this.state.style}>
+							<Timeline/>
+						</div>
+	}
+});
 
 var MenuButtonAdd = React.createClass ({
 	getInitialState: function () {
@@ -40,13 +123,19 @@ var Menu = React.createClass({
 var BtkCalendar = React.createClass({
 	getInitialState: function () {
 		return {
-
+			style: {
+				height: '100%'
+			}
 		}
 	},
 
 
   render: function() {
-    return <Menu/>
+    return	<div style={this.state.style}>
+    					<Menu/>
+    					<Workspace/>
+    				</div>
+
 
   }
 });
