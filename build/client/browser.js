@@ -4,7 +4,7 @@ var React = require('react'),
 
 var reactMountPoint = document.getElementById("appContainer");
 
-reactMountPoint.style.height = window.innerHeight - 70 + 'px'; //	Kostyli #2
+reactMountPoint.style.height = window.innerHeight - 80 + 'px'; //	Kostyli #2
 
 var App = require('../components/btkCalendar');
 
@@ -14,6 +14,42 @@ var AppElement = ReactDOM.render(AppInstance, reactMountPoint);
 },{"../components/btkCalendar":2,"react":169,"react-dom":4}],2:[function(require,module,exports){
 var React = require('react'),
     ReactDOM = require('react-dom');
+
+var MenuButtonAdd = React.createClass({
+	getInitialState: function () {
+		return {
+			style: {
+				backgroundColor: '#99e',
+				borderRadius: '50%',
+				width: '50px',
+				height: '50px'
+			}
+		};
+	},
+
+	render: function () {
+		return React.createElement('div', { style: this.state.style });
+	}
+});
+
+var Menu = React.createClass({
+	getInitialState: function () {
+		return {
+			style: {
+				backgroundColor: '#66d',
+				padding: '15px 30px 15px 30px'
+			}
+		};
+	},
+
+	render: function () {
+		return React.createElement(
+			'div',
+			{ style: this.state.style },
+			React.createElement(MenuButtonAdd, null)
+		);
+	}
+});
 
 var AddEventPopup = React.createClass({
 	getInitialState: function () {
@@ -30,20 +66,22 @@ var AddEventPopup = React.createClass({
 	}
 });
 
+var TimelineBlockHeight = 40;
+
 var Timeline = React.createClass({
 	getInitialState: function () {
 		return {
 			style: {
 				position: 'absolute',
-				left: '0',
-				top: '0',
+				left: '0px',
+				top: '0px',
 				width: '60px',
 				overflow: 'hidden',
 				backgroundColor: '#ddd'
 
 			},
 			hourStyle: {
-				height: '40px',
+				height: TimelineBlockHeight + 'px',
 				textAlign: 'center',
 				lineHeight: '60px', // Kostyli
 				borderBottom: 'solid 2px #ccc'
@@ -55,6 +93,11 @@ var Timeline = React.createClass({
 		return React.createElement(
 			'div',
 			{ style: this.state.style },
+			React.createElement(
+				'div',
+				{ style: this.state.hourStyle },
+				'00:00'
+			),
 			React.createElement(
 				'div',
 				{ style: this.state.hourStyle },
@@ -173,8 +216,49 @@ var Timeline = React.createClass({
 			React.createElement(
 				'div',
 				{ style: this.state.hourStyle },
-				'24:00'
+				'00:00'
 			)
+		);
+	}
+});
+
+var DayBlock = React.createClass({
+	getInitialState: function () {
+		return {
+			wrapperStyle: {
+				float: 'left',
+				width: '600px',
+				margin: '0 1px 0 1px',
+				borderRadius: '5px',
+				overflow: 'hidden'
+			},
+			style: {
+				height: 24 * TimelineBlockHeight + 'px',
+				backgroundColor: '#fff',
+				backgroundImage: 'url(components/dayBlockText.png)'
+			},
+			titleStyle: {
+				height: TimelineBlockHeight + 2 + 'px',
+				backgroundColor: '#68e',
+				fontSize: '1.6em',
+				lineHeight: TimelineBlockHeight + 2 + 'px',
+				padding: '0 15px 0 15px',
+				textAlign: 'right',
+				color: '#fff'
+			}
+		};
+	},
+
+	render: function () {
+		return React.createElement(
+			'div',
+			{ style: this.state.wrapperStyle },
+			React.createElement(
+				'div',
+				{ style: this.state.titleStyle },
+				'May, 15'
+			),
+			React.createElement('div', { style: this.state.style })
 		);
 	}
 });
@@ -185,7 +269,8 @@ var Workspace = React.createClass({
 			style: {
 				position: 'relative',
 				height: '100%',
-				backgroundColor: '#fcfcfc',
+				paddingLeft: '60px',
+				backgroundColor: '#34a',
 				overflowY: 'scroll'
 			}
 		};
@@ -195,43 +280,10 @@ var Workspace = React.createClass({
 		return React.createElement(
 			'div',
 			{ style: this.state.style },
-			React.createElement(Timeline, null)
-		);
-	}
-});
-
-var MenuButtonAdd = React.createClass({
-	getInitialState: function () {
-		return {
-			style: {
-				backgroundColor: '#99e',
-				borderRadius: '50%',
-				width: '50px',
-				height: '50px'
-			}
-		};
-	},
-
-	render: function () {
-		return React.createElement('div', { style: this.state.style });
-	}
-});
-
-var Menu = React.createClass({
-	getInitialState: function () {
-		return {
-			style: {
-				backgroundColor: '#66d',
-				padding: '10px'
-			}
-		};
-	},
-
-	render: function () {
-		return React.createElement(
-			'div',
-			{ style: this.state.style },
-			React.createElement(MenuButtonAdd, null)
+			React.createElement(Timeline, null),
+			React.createElement(DayBlock, null),
+			React.createElement(DayBlock, null),
+			React.createElement(DayBlock, null)
 		);
 	}
 });

@@ -1,6 +1,40 @@
 var React = require('react'),
 		ReactDOM = require('react-dom');
 
+var MenuButtonAdd = React.createClass ({
+	getInitialState: function () {
+		return {
+			style: {
+				backgroundColor: '#99e',
+				borderRadius: '50%',
+				width: '50px',
+				height: '50px'
+			}
+		}
+	},
+
+	render: function () {
+		return <div style={this.state.style} />
+	}
+})
+
+var Menu = React.createClass({
+	getInitialState: function () {
+		return {
+			style: {
+				backgroundColor: '#66d',
+				padding: '15px 30px 15px 30px'
+			}
+		}
+	},
+
+	render: function () {
+		return	<div style={this.state.style}>
+					 		<MenuButtonAdd/>
+						</div>
+	}
+});
+
 var AddEventPopup = React.createClass ({
 	getInitialState: function () {
 		return {
@@ -16,20 +50,22 @@ var AddEventPopup = React.createClass ({
 	}
 });
 
+var TimelineBlockHeight = 40;
+
 var Timeline = React.createClass({
 	getInitialState: function () {
     return {
     	style: {
     		position: 'absolute',
-    		left: '0',
-    		top: '0',
+    		left: '0px',
+    		top: '0px',
     		width: '60px',
     		overflow: 'hidden',
     		backgroundColor: '#ddd'
 
     	},
     	hourStyle: {
-    		height: '40px',
+    		height: TimelineBlockHeight + 'px',
     		textAlign: 'center',
     		lineHeight: '60px',	// Kostyli
     		borderBottom: 'solid 2px #ccc'
@@ -39,6 +75,7 @@ var Timeline = React.createClass({
 
 	render: function () {
 		return <div style={this.state.style}>
+						<div style={this.state.hourStyle}>00:00</div>
 					 	<div style={this.state.hourStyle}>01:00</div>
 					 	<div style={this.state.hourStyle}>02:00</div>
 					 	<div style={this.state.hourStyle}>03:00</div>
@@ -62,8 +99,43 @@ var Timeline = React.createClass({
 					 	<div style={this.state.hourStyle}>21:00</div>
 					 	<div style={this.state.hourStyle}>22:00</div>
 					 	<div style={this.state.hourStyle}>23:00</div>
-					 	<div style={this.state.hourStyle}>24:00</div>
+					 	<div style={this.state.hourStyle}>00:00</div>
 					 </div>
+	}
+});
+
+var DayBlock = React.createClass({
+	getInitialState: function () {
+		return {
+			wrapperStyle: {
+				float: 'left',
+				width: '600px',
+				margin: '0 1px 0 1px',
+				borderRadius: '5px',
+				overflow: 'hidden'
+			},
+			style: {
+				height: 24 * TimelineBlockHeight + 'px',
+				backgroundColor: '#fff',
+				backgroundImage: 'url(components/dayBlockText.png)'
+			},
+			titleStyle: {
+				height: TimelineBlockHeight + 2 + 'px',
+				backgroundColor: '#68e',
+				fontSize: '1.6em',
+				lineHeight: TimelineBlockHeight + 2 + 'px',
+				padding: '0 15px 0 15px',
+				textAlign: 'right',
+				color: '#fff'
+			}
+		}
+	},
+
+	render: function () {
+		return	<div style={this.state.wrapperStyle}>
+							<div style={this.state.titleStyle}>May, 15</div>
+							<div style={this.state.style} />
+						</div>
 	}
 });
 
@@ -73,7 +145,8 @@ var Workspace = React.createClass({
 			style: {
 				position: 'relative',
 				height: '100%',
-				backgroundColor: '#fcfcfc',
+				paddingLeft: '60px',
+				backgroundColor: '#34a',
 				overflowY: 'scroll'
 			}
 		}
@@ -82,43 +155,14 @@ var Workspace = React.createClass({
 	render: function () {
 		return	<div style={this.state.style}>
 							<Timeline/>
+							<DayBlock/>
+							<DayBlock/>
+							<DayBlock/>
 						</div>
 	}
 });
 
-var MenuButtonAdd = React.createClass ({
-	getInitialState: function () {
-		return {
-			style: {
-				backgroundColor: '#99e',
-				borderRadius: '50%',
-				width: '50px',
-				height: '50px'
-			}
-		}
-	},
 
-	render: function () {
-		return <div style={this.state.style} />
-	}
-})
-
-var Menu = React.createClass({
-	getInitialState: function () {
-		return {
-			style: {
-				backgroundColor: '#66d',
-				padding: '10px'
-			}
-		}
-	},
-
-	render: function () {
-		return <div style={this.state.style}>
-					 	<MenuButtonAdd/>
-					 </div>
-	}
-});
 
 var BtkCalendar = React.createClass({
 	getInitialState: function () {

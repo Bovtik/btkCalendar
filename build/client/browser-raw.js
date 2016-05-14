@@ -3,7 +3,7 @@ var React = require('react'),
 
 var reactMountPoint = document.getElementById("appContainer");
 
-reactMountPoint.style.height = window.innerHeight - 70 + 'px'; //	Kostyli #2
+reactMountPoint.style.height = window.innerHeight - 80 + 'px'; //	Kostyli #2
 
 var App = require('../components/btkCalendar');
 

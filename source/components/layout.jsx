@@ -4,7 +4,7 @@ module.exports = React.createClass({
 	render: function () {
 		var bodyStyle = {
 			width: '100%',
-			margin: '0',
+			margin: '0px',
 			overflow: 'hidden',
 			backgroundColor: '#fff'
 		}
