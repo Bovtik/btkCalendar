@@ -97,7 +97,9 @@ var MenuButtonDaysPrev = React.createClass({
 	getInitialState: function () {
 		return {};
 	},
-	handleClick: function (e) {},
+	handleClick: function (e) {
+		AppActions.scrollDaysPrev();
+	},
 	render: function () {
 		return React.createElement(MenuButton, { onClick: this.handleClick, caption: '<' });
 	}
@@ -107,7 +109,9 @@ var MenuButtonDaysNext = React.createClass({
 	getInitialState: function () {
 		return {};
 	},
-	handleClick: function (e) {},
+	handleClick: function (e) {
+		AppActions.scrollDaysNext();
+	},
 	render: function () {
 		return React.createElement(MenuButton, { onClick: this.handleClick, caption: '>' });
 	}
@@ -311,13 +315,13 @@ var DayBlock = React.createClass({
 				padding: '0 15px 0 15px',
 				textAlign: 'right',
 				color: '#fff'
-			},
-			date: this.props.date
+			}
 		};
 	},
 
 	render: function () {
-		var dayTitle = this.state.date.getMonthShortName() + ', ' + this.state.date.getDate();
+		console.log(this.props.date + " <- bleep");
+		var dayTitle = this.props.date.getMonthShortName() + ', ' + this.props.date.getDate();
 		return React.createElement(
 			'div',
 			{ style: this.state.wrapperStyle },
@@ -340,15 +344,22 @@ var Workspace = React.createClass({
 				height: '100%',
 				width: 'calc(100% - 60px)'
 			},
-			viewDate: new Date()
+			viewDate: AppStore.getViewDate()
 		};
+	},
+
+	componentDidMount: function () {
+		AppStore.addChangeListener(this._onChange);
+	},
+	componentWillUnmount: function () {
+		AppStore.removeChangeListener(this._onChange);
 	},
 
 	render: function () {
 		var DayBlockDate = [];
 		for (var i = 0; i < 3; i++) {
 			DayBlockDate[i] = new Date();
-			DayBlockDate[i].setDate(this.state.viewDate.getDate() + i);
+			DayBlockDate[i].setTime(this.state.viewDate.getTime() + i * 24 * 60 * 60 * 1000);
 		}
 		return React.createElement(
 			'div',
@@ -357,6 +368,12 @@ var Workspace = React.createClass({
 			React.createElement(DayBlock, { date: DayBlockDate[1] }),
 			React.createElement(DayBlock, { date: DayBlockDate[2] })
 		);
+	},
+
+	_onChange: function () {
+		this.setState({
+			viewDate: AppStore.getViewDate()
+		});
 	}
 });
 
@@ -406,6 +423,24 @@ var AppActions = {
 			actionType: AppConstants.ADD_C_EVENT,
 			data: data
 		});
+	},
+	removeCEvent: function (data) {
+		AppDispatcher.handleViewAction ({
+			actionType: AppConstants.REMOVE_C_EVENT,
+			data: data
+		});
+	},
+	scrollDaysNext: function (data) {
+		AppDispatcher.handleViewAction ({
+			actionType: AppConstants.DAYS_SCROLL_NEXT,
+			data: data
+		});
+	},
+	scrollDaysPrev: function (data) {
+		AppDispatcher.handleViewAction ({
+			actionType: AppConstants.DAYS_SCROLL_PREV,
+			data: data
+		});
 	}
 };
 
@@ -413,7 +448,10 @@ module.exports = AppActions;
 },{"./appConstants":4,"./appDispatcher":5}],4:[function(require,module,exports){
 module.exports = {	//	C_EVENT = calendar event
 	ADD_C_EVENT:	'ADD_C_EVENT',
-	REMOVE_C_EVENT:	'REMOVE_C_EVENT'
+	REMOVE_C_EVENT:	'REMOVE_C_EVENT',
+	DAYS_SCROLL_NEXT: 'DAYS_SCROLL_NEXT',
+	DAYS_SCROLL_PREV:	'DAYS_SCROLL_PREV',
+	CALL_FORM: 'CALL_FORM'
 }
 },{}],5:[function(require,module,exports){
 var Dispatcher = require('flux').Dispatcher,
@@ -437,11 +475,14 @@ var AppDispatcher = require('./appDispatcher'),
 
 var CHANGE_EVENT = 'change';
 
-var calendarEvents = {};
+var mainStorage = {
+	CEvents: [],
+	viewDate: new Date()
+};
 
 function create (data) {
 	var id = Date.now();
-	calendarEvents[id] = {
+	mainStorage.CEvents[id] = {
 		id: id,
 		start: data.start,
 		duration: data.duration
@@ -449,12 +490,25 @@ function create (data) {
 }
 
 function destroy (id) { 
-	delete calendarEvents[id];
+	delete mainStorage.CEvents[id];
 }
 
 var AppStore = assign({}, EventEmitter.prototype, {
 	getAll: function () {
-   	return calendarEvents;
+   	return mainStorage.CEvents;
+  },
+  getViewDate: function () {
+  	return mainStorage.viewDate;
+  },
+  setViewDate: function (newdate) {
+  	mainStorage.viewDate.setTime(newdate);
+  },
+
+  addChangeListener: function (callback) {
+  	this.on(CHANGE_EVENT, callback);
+  },
+  removeChangeListener: function (callback) {
+  	this.removeListener(CHANGE_EVENT, callback);
   },
 
   emitChange: function () {
@@ -463,7 +517,33 @@ var AppStore = assign({}, EventEmitter.prototype, {
 });
 
 AppDispatcher.register( function (payload) {
-	console.log(payload);
+	switch (payload.action.actionType) {
+		case AppConstants.ADD_C_EVENT:
+
+			break;
+		case AppConstants.REMOVE_C_EVENT:
+
+			break;
+		case AppConstants.DAYS_SCROLL_NEXT:
+			AppStore.setViewDate(
+				AppStore.getViewDate().getTime() + 1 * 24 * 60 * 60 * 1000
+			);
+			console.log(AppStore.getViewDate());
+			AppStore.emitChange();
+			break;
+		case AppConstants.DAYS_SCROLL_PREV:
+			AppStore.setViewDate(
+				AppStore.getViewDate().getTime() - 1 * 24 * 60 * 60 * 1000
+			);
+			console.log(AppStore.getViewDate());
+			AppStore.emitChange();
+			break;
+		case AppConstants.CALL_FORM:
+
+			break;
+		default:
+			break;
+	}
 	return true;
 });
 

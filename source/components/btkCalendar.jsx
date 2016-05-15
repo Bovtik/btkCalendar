@@ -84,7 +84,7 @@ var MenuButtonDaysPrev = React.createClass ({
 		}
 	},
 	handleClick: function (e) {
-		
+		AppActions.scrollDaysPrev();
 	},
 	render: function () {
 		return	<MenuButton onClick={this.handleClick} caption={'<'} />
@@ -97,7 +97,7 @@ var MenuButtonDaysNext = React.createClass ({
 		}
 	},
 	handleClick: function (e) {
-		
+		AppActions.scrollDaysNext();
 	},
 	render: function () {
 		return	<MenuButton onClick={this.handleClick} caption={'>'} />
@@ -205,13 +205,13 @@ var DayBlock = React.createClass({
 				padding: '0 15px 0 15px',
 				textAlign: 'right',
 				color: '#fff'
-			},
-			date: this.props.date
+			}
 		}
 	},
 
 	render: function () {
-		var dayTitle = this.state.date.getMonthShortName() + ', ' + this.state.date.getDate();
+		console.log(this.props.date + " <- bleep");
+		var dayTitle = this.props.date.getMonthShortName() + ', ' + this.props.date.getDate();
 		return	<div style={this.state.wrapperStyle}>
 							<div style={this.state.titleStyle}>{dayTitle}</div>
 							<div style={this.state.style} />
@@ -228,21 +228,34 @@ var Workspace = React.createClass({
 				height: '100%',
 				width: 'calc(100% - 60px)'
 			},
-			viewDate: new Date()
+			viewDate: AppStore.getViewDate()
 		}
+	},
+
+	componentDidMount: function() {
+		AppStore.addChangeListener(this._onChange);
+	},
+	componentWillUnmount: function() {
+		AppStore.removeChangeListener(this._onChange);
 	},
 
 	render: function () {
 		var DayBlockDate = [];
 		for (var i = 0; i < 3; i++) {
 			DayBlockDate[i] = new Date();
-			DayBlockDate[i].setDate(this.state.viewDate.getDate() + i);
+			DayBlockDate[i].setTime(this.state.viewDate.getTime() + i * 24 * 60 * 60 * 1000);
 		}
 		return	<div style={this.state.style}>
 							<DayBlock date={DayBlockDate[0]}/>
 							<DayBlock date={DayBlockDate[1]}/>
 							<DayBlock date={DayBlockDate[2]}/>
 						</div>
+	},
+
+	_onChange: function () {
+		this.setState({
+			viewDate: AppStore.getViewDate()
+		});
 	}
 });
 

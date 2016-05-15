@@ -83,7 +83,9 @@ var MenuButtonDaysPrev = React.createClass({
 	getInitialState: function () {
 		return {};
 	},
-	handleClick: function (e) {},
+	handleClick: function (e) {
+		AppActions.scrollDaysPrev();
+	},
 	render: function () {
 		return React.createElement(MenuButton, { onClick: this.handleClick, caption: '<' });
 	}
@@ -93,7 +95,9 @@ var MenuButtonDaysNext = React.createClass({
 	getInitialState: function () {
 		return {};
 	},
-	handleClick: function (e) {},
+	handleClick: function (e) {
+		AppActions.scrollDaysNext();
+	},
 	render: function () {
 		return React.createElement(MenuButton, { onClick: this.handleClick, caption: '>' });
 	}
@@ -297,13 +301,13 @@ var DayBlock = React.createClass({
 				padding: '0 15px 0 15px',
 				textAlign: 'right',
 				color: '#fff'
-			},
-			date: this.props.date
+			}
 		};
 	},
 
 	render: function () {
-		var dayTitle = this.state.date.getMonthShortName() + ', ' + this.state.date.getDate();
+		console.log(this.props.date + " <- bleep");
+		var dayTitle = this.props.date.getMonthShortName() + ', ' + this.props.date.getDate();
 		return React.createElement(
 			'div',
 			{ style: this.state.wrapperStyle },
@@ -326,15 +330,22 @@ var Workspace = React.createClass({
 				height: '100%',
 				width: 'calc(100% - 60px)'
 			},
-			viewDate: new Date()
+			viewDate: AppStore.getViewDate()
 		};
+	},
+
+	componentDidMount: function () {
+		AppStore.addChangeListener(this._onChange);
+	},
+	componentWillUnmount: function () {
+		AppStore.removeChangeListener(this._onChange);
 	},
 
 	render: function () {
 		var DayBlockDate = [];
 		for (var i = 0; i < 3; i++) {
 			DayBlockDate[i] = new Date();
-			DayBlockDate[i].setDate(this.state.viewDate.getDate() + i);
+			DayBlockDate[i].setTime(this.state.viewDate.getTime() + i * 24 * 60 * 60 * 1000);
 		}
 		return React.createElement(
 			'div',
@@ -343,6 +354,12 @@ var Workspace = React.createClass({
 			React.createElement(DayBlock, { date: DayBlockDate[1] }),
 			React.createElement(DayBlock, { date: DayBlockDate[2] })
 		);
+	},
+
+	_onChange: function () {
+		this.setState({
+			viewDate: AppStore.getViewDate()
+		});
 	}
 });
 
