@@ -11,4 +11,5 @@ var AppInstance = React.createFactory(App)();
 
 var AppElement = ReactDOM.render (
 	AppInstance,
-  reactMountPoint);
+  reactMountPoint
+);
