@@ -14,6 +14,7 @@ var AppActions = {
 			data: data
 		});
 	},
+
 	scrollDaysNext: function (data) {
 		AppDispatcher.handleViewAction ({
 			actionType: AppConstants.DAYS_SCROLL_NEXT,
@@ -24,6 +25,17 @@ var AppActions = {
 		AppDispatcher.handleViewAction ({
 			actionType: AppConstants.DAYS_SCROLL_PREV,
 			data: data
+		});
+	},
+
+	viewForm: function () {
+		AppDispatcher.handleViewAction ({
+			actionType: AppConstants.CALL_FORM
+		});
+	},
+	hideForm: function () {
+		AppDispatcher.handleViewAction ({
+			actionType: AppConstants.HIDE_FORM
 		});
 	}
 };

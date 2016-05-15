@@ -72,7 +72,7 @@ var MenuButtonAdd = React.createClass({
 		return {};
 	},
 	handleClick: function (e) {
-		AppActions.addCEvent('beep');
+		AppActions.viewForm();
 	},
 	render: function () {
 		return React.createElement(MenuButton, { onClick: this.handleClick, caption: '+' });
@@ -306,8 +306,8 @@ var DayBlock = React.createClass({
 	},
 
 	render: function () {
-		console.log(this.props.date + " <- bleep");
 		var dayTitle = this.props.date.getMonthShortName() + ', ' + this.props.date.getDate();
+
 		return React.createElement(
 			'div',
 			{ style: this.state.wrapperStyle },
@@ -363,11 +363,103 @@ var Workspace = React.createClass({
 	}
 });
 
-/*
-this.setState({ 
-    array: this.state.array.concat([newelement])
-})
-*/
+var PopupForm = React.createClass({
+	getInitialState: function () {
+		return {
+			style: {
+				display: 'none',
+				position: 'absolute',
+				top: '80px',
+				left: '0px',
+				right: '0px',
+				margin: '0 auto',
+				width: '480px',
+				height: '320px',
+				padding: '20px',
+				backgroundColor: '#fff',
+				boxShadow: '0px 0px 5px #999',
+				zIndex: '10'
+			},
+			titleStyle: {
+				fontSize: '2.25em',
+				marginLeft: '10px'
+			},
+			textInputStyle: {
+				display: 'block',
+				float: 'left',
+				width: '200px',
+				margin: '10px',
+				padding: '5px',
+				lineHeight: '2em',
+				color: '#555',
+				backgroundColor: '#fefefe',
+				border: 'solid 1px #999'
+			},
+			submitButtonStyle: {
+				position: 'absolute',
+				bottom: '20px',
+				right: '20px',
+				height: '35px',
+				padding: '0 20px 0 20px',
+				lineHeight: '30px',
+				fontSize: '.85em',
+				color: '#fff',
+				backgroundColor: '#68e',
+				border: 'none',
+				boxShadow: '0px 0px 1px #aaa',
+				borderRadius: '3px',
+				cursor: 'pointer'
+			},
+			closeButtonStyle: {
+				position: 'absolute',
+				top: '20px',
+				right: '20px',
+				width: '20px',
+				height: '20px',
+				lineHeight: '10px',
+				padding: '0px',
+				borderRadius: '50%',
+				border: 'solid 1px #777',
+				color: '#777',
+				backgroundColor: '#fff',
+				cursor: 'pointer'
+			}
+		};
+	},
+
+	componentDidMount: function () {
+		AppStore.addChangeListener(this._onChange);
+	},
+	componentWillUnmount: function () {
+		AppStore.removeChangeListener(this._onChange);
+	},
+
+	render: function () {
+		return React.createElement(
+			'div',
+			{ style: this.state.style },
+			React.createElement('input', { value: 'x', type: 'button', style: this.state.closeButtonStyle }),
+			React.createElement(
+				'div',
+				{ style: this.state.titleStyle },
+				'New event'
+			),
+			React.createElement('input', { placeholder: 'Event Title', type: 'text', style: this.state.textInputStyle }),
+			React.createElement('input', { placeholder: 'Date', type: 'text', style: this.state.textInputStyle }),
+			React.createElement('input', { placeholder: 'Time', type: 'text', style: this.state.textInputStyle }),
+			React.createElement('input', { placeholder: 'Duration', type: 'text', style: this.state.textInputStyle }),
+			React.createElement('input', { value: 'Create', type: 'submit', style: this.state.submitButtonStyle })
+		);
+	},
+
+	_onChange: function () {
+		var tmpStyle = this.state.style;
+		tmpStyle.display = AppStore.formIsVisible() ? 'block' : 'none';
+		this.setState({
+			style: tmpStyle
+		});
+	}
+});
 
 var BtkCalendar = React.createClass({
 	getInitialState: function () {
@@ -376,7 +468,9 @@ var BtkCalendar = React.createClass({
 				height: '100%'
 			},
 			wrapperStyle: {
+				position: 'relative',
 				height: '100%',
+				width: '100%',
 				overflowY: 'scroll',
 				backgroundColor: '#34a'
 			}
@@ -391,6 +485,7 @@ var BtkCalendar = React.createClass({
 			React.createElement(
 				'div',
 				{ style: this.state.wrapperStyle },
+				React.createElement(PopupForm, null),
 				React.createElement(Timeline, null),
 				React.createElement(Workspace, null)
 			)

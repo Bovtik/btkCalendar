@@ -7,7 +7,8 @@ var CHANGE_EVENT = 'change';
 
 var mainStorage = {
 	CEvents: [],
-	viewDate: new Date()
+	viewDate: new Date(),
+	formIsVisible: true
 };
 
 function create (data) {
@@ -32,6 +33,16 @@ var AppStore = assign({}, EventEmitter.prototype, {
   },
   setViewDate: function (newdate) {
   	mainStorage.viewDate.setTime(newdate);
+  },
+
+  formIsVisible: function () {
+  	return mainStorage.formIsVisible;
+  },
+  viewForm: function () {
+  	mainStorage.formIsVisible = true;
+  },
+  hideForm: function () {
+  	mainStorage.formIsVisible = false;
   },
 
   addChangeListener: function (callback) {
@@ -69,7 +80,12 @@ AppDispatcher.register( function (payload) {
 			AppStore.emitChange();
 			break;
 		case AppConstants.CALL_FORM:
-
+			AppStore.viewForm();
+			AppStore.emitChange();
+			break;
+		case AppConstants.HIDE_FORM:
+			AppStore.hideForm();
+			AppStore.emitChange();
 			break;
 		default:
 			break;
