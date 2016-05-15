@@ -1,6 +1,9 @@
 var React = require('react'),
 		ReactDOM = require('react-dom');
 
+var AppActions = require('../dataflow/appActions'),
+		AppStore = require('../dataflow/appStore');
+
 Date.prototype.getMonthShortName = function () {
 	switch (this.getMonth() + 1) {
 		case 1:
@@ -67,7 +70,7 @@ var MenuButtonAdd = React.createClass ({
 		}
 	},
 	handleClick: function (e) {
-
+		AppActions.addCEvent('beep');
 	},
 	render: function () {
 		return	<MenuButton onClick={this.handleClick} caption={'+'} />
@@ -81,7 +84,7 @@ var MenuButtonDaysPrev = React.createClass ({
 		}
 	},
 	handleClick: function (e) {
-
+		
 	},
 	render: function () {
 		return	<MenuButton onClick={this.handleClick} caption={'<'} />
@@ -94,7 +97,7 @@ var MenuButtonDaysNext = React.createClass ({
 		}
 	},
 	handleClick: function (e) {
-
+		
 	},
 	render: function () {
 		return	<MenuButton onClick={this.handleClick} caption={'>'} />
@@ -244,7 +247,11 @@ var Workspace = React.createClass({
 });
 
 
-
+/*
+this.setState({ 
+    array: this.state.array.concat([newelement])
+})
+*/
 
 
 var BtkCalendar = React.createClass({

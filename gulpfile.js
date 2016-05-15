@@ -22,11 +22,16 @@ gulp.task('browserify', function() {
     .pipe(gulp.dest('build/client/'));
 });
 
+gulp.task('transport', function () {
+  return gulp.src('source/dataflow/*.js')
+    .pipe(gulp.dest('build/dataflow'));
+});
+
 gulp.task('watch', function () {
   gulp.watch(['build/client/browser-raw.js'], ['browserify']);
 	gulp.watch(['source/client/*.jsx', 'source/server/*.jsx', 'source/components/*.jsx'],
              ['jsx-comp']);
-  
+  gulp.watch('source/dataflow/*.js', ['transport']);
 });
 
 
