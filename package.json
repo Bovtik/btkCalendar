@@ -1,8 +1,8 @@
 {
   "name": "btkCalendar",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "description": "ERROR: No README data found!",
-  "main": "index.js",
+  "main": "build/server/server.js",
   "dependencies": {
     "babel-plugin-transform-react-jsx": "6.8.0",
     "browserify": "13.0.1",

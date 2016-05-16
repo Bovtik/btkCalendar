@@ -6,7 +6,8 @@ module.exports = React.createClass({
 			width: '100%',
 			margin: '0px',
 			overflow: 'hidden',
-			backgroundColor: '#fff'
+			backgroundColor: '#fff',
+			fontFamily: 'arial, sans-serif'
 		}
 		return (
 			<html lang="en">
