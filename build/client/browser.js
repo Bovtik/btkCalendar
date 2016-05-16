@@ -292,12 +292,46 @@ var Timeline = React.createClass({
 	}
 });
 
+var CEventBlock = React.createClass({
+	getInitialState: function () {
+		return {
+			data: this.props.data,
+			style: {
+				position: 'absolute',
+				height: TimelineBlockHeight * (data.duration / 3600000) + 'px', // 36*10^5ms = 1h
+				padding: '10px',
+				backgroundColor: '#33e',
+				borderRadius: '5px',
+				overflow: 'hidden'
+			},
+			titleStyle: {
+				fontSize: '1em',
+				color: '#fff',
+				lineHeight: '2em'
+			}
+		};
+	},
+
+	render: function () {
+		return React.createElement(
+			'div',
+			{ style: this.state.style },
+			React.createElement(
+				'div',
+				{ style: this.state.titleStyle },
+				this.state.data.title
+			)
+		);
+	}
+});
+
 var DayBlock = React.createClass({
 	getInitialState: function () {
 		return {
 			wrapperStyle: {
 				display: 'inline-block',
-				width: '33%', //	100% / 7
+				position: 'relative',
+				width: '33%',
 				minWidth: '350px',
 				margin: '0 .1515% 0 .1515%',
 				borderRadius: '5px',
@@ -316,7 +350,9 @@ var DayBlock = React.createClass({
 				padding: '0 15px 0 15px',
 				textAlign: 'right',
 				color: '#fff'
-			}
+			},
+			date: this.props.date,
+			CEvents: AppStore.getCEventsByDate(this.props.date)
 		};
 	},
 
@@ -509,7 +545,7 @@ var PopupForm = React.createClass({
 	render: function () {
 		return React.createElement(
 			'form',
-			{ onSubmit: this.handleSubmit, style: this.state.style },
+			{ style: this.state.style },
 			React.createElement(FormCloseButton, null),
 			React.createElement(
 				'div',
@@ -517,9 +553,9 @@ var PopupForm = React.createClass({
 				'New event'
 			),
 			React.createElement('input', { ref: 'inpTitle', placeholder: 'Event Title', type: 'text', style: this.state.textInputStyle }),
-			React.createElement('input', { ref: 'inpDate', placeholder: 'Date', type: 'text', style: this.state.textInputStyle }),
-			React.createElement('input', { ref: 'inpTime', placeholder: 'Time', type: 'text', style: this.state.textInputStyle }),
-			React.createElement('input', { ref: 'inpDur', placeholder: 'Duration', type: 'text', style: this.state.textInputStyle }),
+			React.createElement('input', { ref: 'inpDate', placeholder: 'Date (dd.mm.yyyy)', type: 'text', style: this.state.textInputStyle }),
+			React.createElement('input', { ref: 'inpTime', placeholder: 'Time (hh:mm)', type: 'text', style: this.state.textInputStyle }),
+			React.createElement('input', { ref: 'inpDur', placeholder: 'Duration (hh.mm / hh:mm)', type: 'text', style: this.state.textInputStyle }),
 			React.createElement(FormSubmitButton, { onClick: this.handleSubmit })
 		);
 	},
@@ -645,7 +681,7 @@ var CHANGE_EVENT = 'change';
 var mainStorage = {
 	CEvents: [],
 	viewDate: new Date(),
-	formIsVisible: true
+	formIsVisible: false
 };
 
 
@@ -653,6 +689,16 @@ var mainStorage = {
 var AppStore = assign({}, EventEmitter.prototype, {
 	getAll: function () {
    	return mainStorage.CEvents;
+  },
+  getCEventsByDate: function (date) {
+  	var evArray = [];
+  	mainStorage.CEvents.forEach(function (item, i, arr) {
+  		if (item.start.getDate() == date.getDate() &&
+  				item.start.getMonth() == date.getMonth() &&
+  				item.start.getFullYear() == date.getFullYear())
+  			evArray.push[item];
+  	});
+  	return evArray;
   },
 
   addCEvent: function (data) {
@@ -700,9 +746,7 @@ var AppStore = assign({}, EventEmitter.prototype, {
 AppDispatcher.register( function (payload) {
 	switch (payload.action.actionType) {
 		case AppConstants.ADD_C_EVENT:
-			console.log(AppStore.getAll());
 			AppStore.addCEvent(payload.action.data);
-			// console.log(payload.action.data);
 			AppStore.emitChange();
 			break;
 		case AppConstants.REMOVE_C_EVENT:
@@ -712,14 +756,12 @@ AppDispatcher.register( function (payload) {
 			AppStore.setViewDate(
 				AppStore.getViewDate().getTime() + 1 * 24 * 60 * 60 * 1000
 			);
-			console.log(AppStore.getViewDate());
 			AppStore.emitChange();
 			break;
 		case AppConstants.DAYS_SCROLL_PREV:
 			AppStore.setViewDate(
 				AppStore.getViewDate().getTime() - 1 * 24 * 60 * 60 * 1000
 			);
-			console.log(AppStore.getViewDate());
 			AppStore.emitChange();
 			break;
 		case AppConstants.CALL_FORM:

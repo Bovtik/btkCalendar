@@ -175,12 +175,40 @@ var Timeline = React.createClass({
 	}
 });
 
+var CEventBlock = React.createClass({
+	getInitialState: function () {
+		return {
+			data: this.props.data,
+			style: {
+				position: 'absolute',
+				height: TimelineBlockHeight * (data.duration / 3600000) + 'px',	// 36*10^5ms = 1h
+				padding: '10px',
+				backgroundColor: '#33e',
+				borderRadius: '5px',
+				overflow: 'hidden'
+			},
+			titleStyle: {
+				fontSize: '1em',
+				color: '#fff',
+				lineHeight: '2em'
+			}
+		}
+	},
+
+	render: function () {
+		return	<div style={this.state.style}>
+							<div style={this.state.titleStyle}>{this.state.data.title}</div>
+						</div>
+	}
+});
+
 var DayBlock = React.createClass({
 	getInitialState: function () {
 		return {
 			wrapperStyle: {
 				display: 'inline-block',
-				width: '33%',	//	100% / 7
+				position: 'relative',
+				width: '33%',
 				minWidth: '350px',
 				margin: '0 .1515% 0 .1515%',
 				borderRadius: '5px',
@@ -199,7 +227,9 @@ var DayBlock = React.createClass({
 				padding: '0 15px 0 15px',
 				textAlign: 'right',
 				color: '#fff'
-			}
+			},
+			date: this.props.date,
+			CEvents: AppStore.getCEventsByDate(this.props.date)
 		}
 	},
 
@@ -209,6 +239,7 @@ var DayBlock = React.createClass({
 		return	<div style={this.state.wrapperStyle}>
 							<div style={this.state.titleStyle}>{dayTitle}</div>
 							<div style={this.state.style} />
+
 						</div>
 	}
 });
@@ -375,13 +406,13 @@ var PopupForm = React.createClass({
 	},
 
 	render: function () {
-		return	<form onSubmit={this.handleSubmit} style={this.state.style}>
+		return	<form style={this.state.style}>
 							<FormCloseButton/>
 							<div style={this.state.titleStyle}>{'New event'}</div>
 							<input ref="inpTitle" placeholder="Event Title" type="text" style={this.state.textInputStyle}/>
-							<input ref="inpDate" placeholder="Date" type="text" style={this.state.textInputStyle}/>
-							<input ref="inpTime" placeholder="Time" type="text" style={this.state.textInputStyle}/>
-							<input ref="inpDur" placeholder="Duration" type="text" style={this.state.textInputStyle}/>
+							<input ref="inpDate" placeholder="Date (dd.mm.yyyy)" type="text" style={this.state.textInputStyle}/>
+							<input ref="inpTime" placeholder="Time (hh:mm)" type="text" style={this.state.textInputStyle}/>
+							<input ref="inpDur" placeholder="Duration (hh.mm / hh:mm)" type="text" style={this.state.textInputStyle}/>
 							<FormSubmitButton onClick={this.handleSubmit}/>
 						</form>
 	},

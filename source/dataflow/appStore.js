@@ -8,7 +8,7 @@ var CHANGE_EVENT = 'change';
 var mainStorage = {
 	CEvents: [],
 	viewDate: new Date(),
-	formIsVisible: true
+	formIsVisible: false
 };
 
 
@@ -16,6 +16,16 @@ var mainStorage = {
 var AppStore = assign({}, EventEmitter.prototype, {
 	getAll: function () {
    	return mainStorage.CEvents;
+  },
+  getCEventsByDate: function (date) {
+  	var evArray = [];
+  	mainStorage.CEvents.forEach(function (item, i, arr) {
+  		if (item.start.getDate() == date.getDate() &&
+  				item.start.getMonth() == date.getMonth() &&
+  				item.start.getFullYear() == date.getFullYear())
+  			evArray.push[item];
+  	});
+  	return evArray;
   },
 
   addCEvent: function (data) {
@@ -73,14 +83,12 @@ AppDispatcher.register( function (payload) {
 			AppStore.setViewDate(
 				AppStore.getViewDate().getTime() + 1 * 24 * 60 * 60 * 1000
 			);
-			console.log(AppStore.getViewDate());
 			AppStore.emitChange();
 			break;
 		case AppConstants.DAYS_SCROLL_PREV:
 			AppStore.setViewDate(
 				AppStore.getViewDate().getTime() - 1 * 24 * 60 * 60 * 1000
 			);
-			console.log(AppStore.getViewDate());
 			AppStore.emitChange();
 			break;
 		case AppConstants.CALL_FORM:
