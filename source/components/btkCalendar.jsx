@@ -1,5 +1,6 @@
 var React = require('react'),
-		ReactDOM = require('react-dom');
+		ReactDOM = require('react-dom'),
+		update = require('react-addons-update');
 
 var AppActions = require('../dataflow/appActions'),
 		AppStore = require('../dataflow/appStore');
@@ -35,6 +36,8 @@ Date.prototype.getMonthShortName = function () {
 	}
 }
 
+var TimelineBlockHeight = 40;
+
 var MenuButton = React.createClass({
 	getInitialState: function () {
 		return {
@@ -65,9 +68,7 @@ var MenuButton = React.createClass({
 
 var MenuButtonAdd = React.createClass ({
 	getInitialState: function () {
-		return {
-			
-		}
+		return {}
 	},
 	handleClick: function (e) {
 		AppActions.viewForm();
@@ -79,9 +80,7 @@ var MenuButtonAdd = React.createClass ({
 
 var MenuButtonDaysPrev = React.createClass ({
 	getInitialState: function () {
-		return {
-
-		}
+		return {}
 	},
 	handleClick: function (e) {
 		AppActions.scrollDaysPrev();
@@ -93,8 +92,7 @@ var MenuButtonDaysPrev = React.createClass ({
 
 var MenuButtonDaysNext = React.createClass ({
 	getInitialState: function () {
-		return {
-		}
+		return {}
 	},
 	handleClick: function (e) {
 		AppActions.scrollDaysNext();
@@ -123,8 +121,6 @@ var Menu = React.createClass({
 						</div>
 	}
 });
-
-var TimelineBlockHeight = 40;
 
 var Timeline = React.createClass({
 	getInitialState: function () {
@@ -257,13 +253,74 @@ var Workspace = React.createClass({
 	}
 });
 
+var FormCloseButton = React.createClass({
+	getInitialState: function () {
+		return {
+			style: {
+				position: 'absolute',
+				top: '20px',
+				right: '20px',
+				width: '20px',
+				height: '20px',
+				lineHeight: '10px',
+				padding: '0px',
+				borderRadius: '50%',
+				border: 'solid 1px #777',
+				color: '#777',
+				backgroundColor: '#fff',
+				cursor: 'pointer'
+			}
+		}
+	},
+
+	handleClick: function () {
+		AppActions.hideForm();
+	},
+
+	render: function () {
+		return	<button type="button" onClick={this.handleClick} style={this.state.style}>{'x'}</button>
+	}
+});
+
+var FormSubmitButton = React.createClass({
+	getInitialState: function () {
+		return {
+			style: {
+				position: 'absolute',
+				bottom: '20px',
+				right: '20px',
+				height: '35px',
+				padding: '0 20px 0 20px',
+				lineHeight: '30px',
+				fontSize: '.85em',
+				color: '#fff',
+				backgroundColor: '#68e',
+				border: 'none',
+				boxShadow: '0px 0px 1px #aaa',
+				borderRadius: '3px',
+				cursor: 'pointer'
+			}
+		}
+	},
+
+	handleClick: function (e) {
+		if (this.props.onClick) {            
+			this.props.onClick.call(this, e);
+		}
+	},
+
+	render: function () {
+		return	<button onClick={this.handleClick} type="button" style={this.state.style}>{'Create'}</button>
+	}
+});
+
 var PopupForm = React.createClass({
 	getInitialState: function () {
 		return {
 			style: {
 				display: 'none',
 				position: 'absolute',
-				top: '80px',
+				top: '160px',
 				left: '0px',
 				right: '0px',
 				margin: '0 auto',
@@ -288,40 +345,27 @@ var PopupForm = React.createClass({
 				color: '#555',
 				backgroundColor: '#fefefe',
 				border: 'solid 1px #999'
-			},
-			submitButtonStyle: {
-				position: 'absolute',
-				bottom: '20px',
-				right: '20px',
-				height: '35px',
-				padding: '0 20px 0 20px',
-				lineHeight: '30px',
-				fontSize: '.85em',
-				color: '#fff',
-				backgroundColor: '#68e',
-				border: 'none',
-				boxShadow: '0px 0px 1px #aaa',
-				borderRadius: '3px',
-				cursor: 'pointer'
-			},
-			closeButtonStyle: {
-				position: 'absolute',
-				top: '20px',
-				right: '20px',
-				width: '20px',
-				height: '20px',
-				lineHeight: '10px',
-				padding: '0px',
-				borderRadius: '50%',
-				border: 'solid 1px #777',
-				color: '#777',
-				backgroundColor: '#fff',
-				cursor: 'pointer'
-			}
+			}		
 		}
 	},
 
 
+	handleSubmit: function () {
+
+		var dateArr = this.refs.inpDate.value.split('.'),
+				timeArr = this.refs.inpTime.value.split(':');
+		var start = new Date (dateArr[2], dateArr[1] - 1, dateArr[0],
+													timeArr[0], timeArr[1], 0, 0);
+		var cEvData = {
+			title: this.refs.inpTitle.value,
+			start: start,
+			duration: +this.refs.inpDur.value
+		};
+		AppActions.addCEvent(cEvData);
+		setTimeout( function () {		// UX - not an instant, sudden form vanishing
+			AppActions.hideForm();
+		}, 100);
+	},
 
 	componentDidMount: function() {
 		AppStore.addChangeListener(this._onChange);
@@ -331,23 +375,24 @@ var PopupForm = React.createClass({
 	},
 
 	render: function () {
-		return	<div style={this.state.style}>
-							<input value="x" type="button" style={this.state.closeButtonStyle}/>
+		return	<form onSubmit={this.handleSubmit} style={this.state.style}>
+							<FormCloseButton/>
 							<div style={this.state.titleStyle}>{'New event'}</div>
-							<input placeholder="Event Title" type="text" style={this.state.textInputStyle}/>
-							<input placeholder="Date" type="text" style={this.state.textInputStyle}/>
-							<input placeholder="Time" type="text" style={this.state.textInputStyle}/>
-							<input placeholder="Duration" type="text" style={this.state.textInputStyle}/>
-							<input value="Create" type="submit" style={this.state.submitButtonStyle}/>
-						</div>
+							<input ref="inpTitle" placeholder="Event Title" type="text" style={this.state.textInputStyle}/>
+							<input ref="inpDate" placeholder="Date" type="text" style={this.state.textInputStyle}/>
+							<input ref="inpTime" placeholder="Time" type="text" style={this.state.textInputStyle}/>
+							<input ref="inpDur" placeholder="Duration" type="text" style={this.state.textInputStyle}/>
+							<FormSubmitButton onClick={this.handleSubmit}/>
+						</form>
 	},
 
 	_onChange: function () {
-		var tmpStyle = this.state.style;
-		tmpStyle.display = AppStore.formIsVisible() ? 'block' : 'none';
-		this.setState({
-			style: tmpStyle
+		var newState = update (this.state, {
+		  style: {
+		    display: { $set: AppStore.formIsVisible() ? 'block' : 'none' }
+		  }
 		});
+		this.setState(newState);
 	}
 });
 
@@ -371,8 +416,8 @@ var BtkCalendar = React.createClass({
   render: function() {
     return	<div style={this.state.style}>
     					<Menu/>
+    					<PopupForm/>
     					<div style={this.state.wrapperStyle}>
-    						<PopupForm/>
 	    					<Timeline/>
 	    					<Workspace/>
 	    				</div>

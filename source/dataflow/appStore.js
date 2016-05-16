@@ -11,23 +11,26 @@ var mainStorage = {
 	formIsVisible: true
 };
 
-function create (data) {
-	var id = Date.now();
-	mainStorage.CEvents[id] = {
-		id: id,
-		start: data.start,
-		duration: data.duration
-	};
-}
 
-function destroy (id) { 
-	delete mainStorage.CEvents[id];
-}
 
 var AppStore = assign({}, EventEmitter.prototype, {
 	getAll: function () {
    	return mainStorage.CEvents;
   },
+
+  addCEvent: function (data) {
+  	var id = mainStorage.CEvents.length;
+  	mainStorage.CEvents[id] = {
+  		id: id,
+  		title: data.title,
+  		start: data.start,
+  		duration: data.duration
+  	};
+  },
+  deleteCEvent: function (id) { 
+  	delete mainStorage.CEvents[id];
+  },
+
   getViewDate: function () {
   	return mainStorage.viewDate;
   },
@@ -60,7 +63,10 @@ var AppStore = assign({}, EventEmitter.prototype, {
 AppDispatcher.register( function (payload) {
 	switch (payload.action.actionType) {
 		case AppConstants.ADD_C_EVENT:
-
+			console.log(AppStore.getAll());
+			AppStore.addCEvent(payload.action.data);
+			// console.log(payload.action.data);
+			AppStore.emitChange();
 			break;
 		case AppConstants.REMOVE_C_EVENT:
 

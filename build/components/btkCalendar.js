@@ -1,5 +1,6 @@
 var React = require('react'),
-    ReactDOM = require('react-dom');
+    ReactDOM = require('react-dom'),
+    update = require('react-addons-update');
 
 var AppActions = require('../dataflow/appActions'),
     AppStore = require('../dataflow/appStore');
@@ -34,6 +35,8 @@ Date.prototype.getMonthShortName = function () {
 			break;
 	}
 };
+
+var TimelineBlockHeight = 40;
 
 var MenuButton = React.createClass({
 	getInitialState: function () {
@@ -123,8 +126,6 @@ var Menu = React.createClass({
 		);
 	}
 });
-
-var TimelineBlockHeight = 40;
 
 var Timeline = React.createClass({
 	getInitialState: function () {
@@ -363,13 +364,82 @@ var Workspace = React.createClass({
 	}
 });
 
+var FormCloseButton = React.createClass({
+	getInitialState: function () {
+		return {
+			style: {
+				position: 'absolute',
+				top: '20px',
+				right: '20px',
+				width: '20px',
+				height: '20px',
+				lineHeight: '10px',
+				padding: '0px',
+				borderRadius: '50%',
+				border: 'solid 1px #777',
+				color: '#777',
+				backgroundColor: '#fff',
+				cursor: 'pointer'
+			}
+		};
+	},
+
+	handleClick: function () {
+		AppActions.hideForm();
+	},
+
+	render: function () {
+		return React.createElement(
+			'button',
+			{ type: 'button', onClick: this.handleClick, style: this.state.style },
+			'x'
+		);
+	}
+});
+
+var FormSubmitButton = React.createClass({
+	getInitialState: function () {
+		return {
+			style: {
+				position: 'absolute',
+				bottom: '20px',
+				right: '20px',
+				height: '35px',
+				padding: '0 20px 0 20px',
+				lineHeight: '30px',
+				fontSize: '.85em',
+				color: '#fff',
+				backgroundColor: '#68e',
+				border: 'none',
+				boxShadow: '0px 0px 1px #aaa',
+				borderRadius: '3px',
+				cursor: 'pointer'
+			}
+		};
+	},
+
+	handleClick: function (e) {
+		if (this.props.onClick) {
+			this.props.onClick.call(this, e);
+		}
+	},
+
+	render: function () {
+		return React.createElement(
+			'button',
+			{ onClick: this.handleClick, type: 'button', style: this.state.style },
+			'Create'
+		);
+	}
+});
+
 var PopupForm = React.createClass({
 	getInitialState: function () {
 		return {
 			style: {
 				display: 'none',
 				position: 'absolute',
-				top: '80px',
+				top: '160px',
 				left: '0px',
 				right: '0px',
 				margin: '0 auto',
@@ -394,37 +464,25 @@ var PopupForm = React.createClass({
 				color: '#555',
 				backgroundColor: '#fefefe',
 				border: 'solid 1px #999'
-			},
-			submitButtonStyle: {
-				position: 'absolute',
-				bottom: '20px',
-				right: '20px',
-				height: '35px',
-				padding: '0 20px 0 20px',
-				lineHeight: '30px',
-				fontSize: '.85em',
-				color: '#fff',
-				backgroundColor: '#68e',
-				border: 'none',
-				boxShadow: '0px 0px 1px #aaa',
-				borderRadius: '3px',
-				cursor: 'pointer'
-			},
-			closeButtonStyle: {
-				position: 'absolute',
-				top: '20px',
-				right: '20px',
-				width: '20px',
-				height: '20px',
-				lineHeight: '10px',
-				padding: '0px',
-				borderRadius: '50%',
-				border: 'solid 1px #777',
-				color: '#777',
-				backgroundColor: '#fff',
-				cursor: 'pointer'
 			}
 		};
+	},
+
+	handleSubmit: function () {
+
+		var dateArr = this.refs.inpDate.value.split('.'),
+		    timeArr = this.refs.inpTime.value.split(':');
+		var start = new Date(dateArr[2], dateArr[1] - 1, dateArr[0], timeArr[0], timeArr[1], 0, 0);
+		var cEvData = {
+			title: this.refs.inpTitle.value,
+			start: start,
+			duration: +this.refs.inpDur.value
+		};
+		AppActions.addCEvent(cEvData);
+		setTimeout(function () {
+			// UX - not an instant, sudden form vanishing
+			AppActions.hideForm();
+		}, 100);
 	},
 
 	componentDidMount: function () {
@@ -436,28 +494,29 @@ var PopupForm = React.createClass({
 
 	render: function () {
 		return React.createElement(
-			'div',
-			{ style: this.state.style },
-			React.createElement('input', { value: 'x', type: 'button', style: this.state.closeButtonStyle }),
+			'form',
+			{ onSubmit: this.handleSubmit, style: this.state.style },
+			React.createElement(FormCloseButton, null),
 			React.createElement(
 				'div',
 				{ style: this.state.titleStyle },
 				'New event'
 			),
-			React.createElement('input', { placeholder: 'Event Title', type: 'text', style: this.state.textInputStyle }),
-			React.createElement('input', { placeholder: 'Date', type: 'text', style: this.state.textInputStyle }),
-			React.createElement('input', { placeholder: 'Time', type: 'text', style: this.state.textInputStyle }),
-			React.createElement('input', { placeholder: 'Duration', type: 'text', style: this.state.textInputStyle }),
-			React.createElement('input', { value: 'Create', type: 'submit', style: this.state.submitButtonStyle })
+			React.createElement('input', { ref: 'inpTitle', placeholder: 'Event Title', type: 'text', style: this.state.textInputStyle }),
+			React.createElement('input', { ref: 'inpDate', placeholder: 'Date', type: 'text', style: this.state.textInputStyle }),
+			React.createElement('input', { ref: 'inpTime', placeholder: 'Time', type: 'text', style: this.state.textInputStyle }),
+			React.createElement('input', { ref: 'inpDur', placeholder: 'Duration', type: 'text', style: this.state.textInputStyle }),
+			React.createElement(FormSubmitButton, { onClick: this.handleSubmit })
 		);
 	},
 
 	_onChange: function () {
-		var tmpStyle = this.state.style;
-		tmpStyle.display = AppStore.formIsVisible() ? 'block' : 'none';
-		this.setState({
-			style: tmpStyle
+		var newState = update(this.state, {
+			style: {
+				display: { $set: AppStore.formIsVisible() ? 'block' : 'none' }
+			}
 		});
+		this.setState(newState);
 	}
 });
 
@@ -482,10 +541,10 @@ var BtkCalendar = React.createClass({
 			'div',
 			{ style: this.state.style },
 			React.createElement(Menu, null),
+			React.createElement(PopupForm, null),
 			React.createElement(
 				'div',
 				{ style: this.state.wrapperStyle },
-				React.createElement(PopupForm, null),
 				React.createElement(Timeline, null),
 				React.createElement(Workspace, null)
 			)
