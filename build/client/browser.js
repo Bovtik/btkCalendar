@@ -50,6 +50,10 @@ Date.prototype.getMonthShortName = function () {
 	}
 };
 
+var constants = {
+	msInHour: 3600000
+};
+
 var TimelineBlockHeight = 40;
 
 var MenuButton = React.createClass({
@@ -158,7 +162,7 @@ var Timeline = React.createClass({
 				height: TimelineBlockHeight + 'px',
 				textAlign: 'center',
 				lineHeight: '60px', // Kostyli
-				borderBottom: 'solid 2px #ccc'
+				borderBottom: 'solid ' + TimelineBlockHeight / 20 + 'px #ccc'
 			}
 		};
 	},
@@ -292,6 +296,16 @@ var Timeline = React.createClass({
 	}
 });
 
+var RemoveEventButton = React.createClass({
+	getInitialState: function () {
+		return {};
+	},
+
+	render: function () {
+		return React.createElement('div', null);
+	}
+});
+
 var CEventBlock = React.createClass({
 	getInitialState: function () {
 		return {
@@ -301,15 +315,15 @@ var CEventBlock = React.createClass({
 				margin: '0 1% 0 1%',
 				position: 'absolute',
 				top: (2 + TimelineBlockHeight) * (this.props.data.start.getHours() + this.props.data.start.getMinutes() / 60) - 1 + 'px',
-				height: (2 + TimelineBlockHeight) * (this.props.data.duration / 3600000) + 'px', // 36*10^5ms = 1h
+				height: (2 + TimelineBlockHeight) * (this.props.data.duration / constants.msInHour) + 'px', // 36*10^5ms = 1h
 				backgroundColor: '#88e',
 				borderRadius: '5px',
 				boxShadow: '1px 1px 2px #aaa',
 				overflow: 'hidden'
 			},
 			titleStyle: {
-				margin: '10px',
-				fontSize: '1.2em',
+				margin: this.props.data.duration >= constants.msInHour ? '10px' : '3px',
+				fontSize: this.props.data.duration >= constants.msInHour ? '1.2em' : '.75em',
 				color: '#fff'
 			}
 		};
@@ -533,29 +547,51 @@ var PopupForm = React.createClass({
 				color: '#555',
 				backgroundColor: '#fefefe',
 				border: 'solid 1px #999'
+			},
+			tipStyle: {
+				position: 'absolute',
+				left: '20px',
+				bottom: '80px',
+				color: '#aaa'
 			}
 		};
 	},
 
 	handleSubmit: function () {
+		var title = this.refs.inpTitle,
+		    date = this.refs.inpDate,
+		    time = this.refs.inpTime,
+		    dur = this.refs.inpDur;
 
-		var dateArr = this.refs.inpDate.value.split('.'),
-		    timeArr = this.refs.inpTime.value.split(':');
+		title.style.borderColor = date.style.borderColor = time.style.borderColor = dur.style.borderColor = '#999';
 
-		var start = new Date(dateArr[2], dateArr[1] - 1, dateArr[0], timeArr[0], timeArr[1], 0, 0);
+		if (!title.value.match(/^.{1,45}$/)) {
+			title.style.borderColor = 'red';
+		} else if (!date.value.match(/^\d{2}[.]\d{2}[.]\d{4}$/)) {
+			date.style.borderColor = 'red';
+		} else if (!time.value.match(/^\d{1,2}[:]\d{1,2}$/)) {
+			time.style.borderColor = 'red';
+		} else if (!dur.value.match(/^\d{1,2}[:|.]\d{1,2}$/)) {
+			dur.style.borderColor = 'red';
+		} else {
+			var dateArr = date.value.split('.'),
+			    timeArr = time.value.split(':');
 
-		var durArr = this.refs.inpDur.value.replace(/:/g, '.').split('.');
+			var start = new Date(dateArr[2], dateArr[1] - 1, dateArr[0], timeArr[0], timeArr[1], 0, 0);
 
-		var cEvData = {
-			title: this.refs.inpTitle.value,
-			start: start,
-			duration: (+durArr[0] * 60 + +durArr[1]) * 60 * 1000
-		};
-		AppActions.addCEvent(cEvData);
-		setTimeout(function () {
-			// UX - not an instant, sudden form vanishing
-			AppActions.hideForm();
-		}, 100);
+			var durArr = dur.value.replace(/:/g, '.').split('.');
+
+			var cEvData = {
+				title: title.value,
+				start: start,
+				duration: (+durArr[0] * 60 + +durArr[1]) * 60 * 1000
+			};
+			AppActions.addCEvent(cEvData);
+			setTimeout(function () {
+				// UX - not an instant, sudden form vanishing
+				AppActions.hideForm();
+			}, 100);
+		}
 	},
 
 	componentDidMount: function () {
@@ -575,10 +611,15 @@ var PopupForm = React.createClass({
 				{ style: this.state.titleStyle },
 				'New event'
 			),
-			React.createElement('input', { ref: 'inpTitle', placeholder: 'Event Title', type: 'text', style: this.state.textInputStyle }),
+			React.createElement('input', { ref: 'inpTitle', placeholder: 'Event Title (max: 40 chars)', type: 'text', style: this.state.textInputStyle }),
 			React.createElement('input', { ref: 'inpDate', placeholder: 'Date (dd.mm.yyyy)', type: 'text', style: this.state.textInputStyle }),
 			React.createElement('input', { ref: 'inpTime', placeholder: 'Time (hh:mm)', type: 'text', style: this.state.textInputStyle }),
 			React.createElement('input', { ref: 'inpDur', placeholder: 'Duration (hh.mm / hh:mm)', type: 'text', style: this.state.textInputStyle }),
+			React.createElement(
+				'div',
+				{ style: this.state.tipStyle },
+				'Check the input boxes placeholders for rules of input'
+			),
 			React.createElement(FormSubmitButton, { onClick: this.handleSubmit })
 		);
 	},
