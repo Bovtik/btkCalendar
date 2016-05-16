@@ -11,7 +11,7 @@ var AppActions = {
 	removeCEvent: function (data) {
 		AppDispatcher.handleViewAction ({
 			actionType: AppConstants.REMOVE_C_EVENT,
-			data: data
+			data: { id: data }
 		});
 	},
 

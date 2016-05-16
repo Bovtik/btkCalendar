@@ -292,6 +292,39 @@ var RemoveEventButton = React.createClass({
 	}
 });
 
+var CEventRemoveButton = React.createClass({
+	getInitialState: function () {
+		return {
+			style: {
+				position: 'absolute',
+				top: '10px',
+				right: '10px',
+				width: '20px',
+				height: '20px',
+				lineHeight: '10px',
+				padding: '0px',
+				borderRadius: '50%',
+				border: 'solid 1px #335',
+				color: '#335',
+				backgroundColor: '#eef',
+				cursor: 'pointer'
+			}
+		};
+	},
+
+	handleClick: function (e) {
+		AppActions.removeCEvent(this.props.evId);
+	},
+
+	render: function () {
+		return React.createElement(
+			'button',
+			{ type: 'button', onClick: this.handleClick, style: this.state.style },
+			'x'
+		);
+	}
+});
+
 var CEventBlock = React.createClass({
 	getInitialState: function () {
 		return {
@@ -315,6 +348,13 @@ var CEventBlock = React.createClass({
 		};
 	},
 
+	componentDidMount: function () {
+		AppStore.addChangeListener(this._onChange);
+	},
+	componentWillUnmount: function () {
+		AppStore.removeChangeListener(this._onChange);
+	},
+
 	render: function () {
 		return React.createElement(
 			'div',
@@ -323,8 +363,15 @@ var CEventBlock = React.createClass({
 				'div',
 				{ style: this.state.titleStyle },
 				this.state.data.title
-			)
+			),
+			React.createElement(CEventRemoveButton, { evId: this.state.data.id })
 		);
+	},
+
+	_onChange: function () {
+		this.setState({
+			viewDate: AppStore.getViewDate()
+		});
 	}
 });
 

@@ -37,7 +37,7 @@ var AppStore = assign({}, EventEmitter.prototype, {
   		duration: data.duration
   	};
   },
-  deleteCEvent: function (id) { 
+  removeCEvent: function (id) { 
   	delete mainStorage.CEvents[id];
   },
 
@@ -76,29 +76,36 @@ AppDispatcher.register( function (payload) {
 			AppStore.addCEvent(payload.action.data);
 			AppStore.emitChange();
 			break;
-		case AppConstants.REMOVE_C_EVENT:
 
+		case AppConstants.REMOVE_C_EVENT:
+			AppStore.removeCEvent(payload.action.data.id);
+			AppStore.emitChange();
 			break;
+
 		case AppConstants.DAYS_SCROLL_NEXT:
 			AppStore.setViewDate(
 				AppStore.getViewDate().getTime() + 1 * 24 * 60 * 60 * 1000
 			);
 			AppStore.emitChange();
 			break;
+
 		case AppConstants.DAYS_SCROLL_PREV:
 			AppStore.setViewDate(
 				AppStore.getViewDate().getTime() - 1 * 24 * 60 * 60 * 1000
 			);
 			AppStore.emitChange();
 			break;
+
 		case AppConstants.CALL_FORM:
 			AppStore.viewForm();
 			AppStore.emitChange();
 			break;
+
 		case AppConstants.HIDE_FORM:
 			AppStore.hideForm();
 			AppStore.emitChange();
 			break;
+
 		default:
 			break;
 	}
