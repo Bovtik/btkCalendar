@@ -2,7 +2,8 @@
   "name": "btkCalendar",
   "version": "0.1.0",
   "description": "ERROR: No README data found!",
-  "main": "build/server/server.js",
+  "main": "./build/server/server.js",
+
   "dependencies": {
     "babel-plugin-transform-react-jsx": "6.8.0",
     "browserify": "13.0.1",
@@ -19,6 +20,7 @@
   },
   "devDependencies": {},
   "scripts": {
+    "start": "node ./build/server/server.js"
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "Bovtik",

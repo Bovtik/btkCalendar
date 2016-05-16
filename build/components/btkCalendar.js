@@ -148,6 +148,7 @@ var Timeline = React.createClass({
 				height: TimelineBlockHeight + 'px',
 				textAlign: 'center',
 				lineHeight: '60px', // Kostyli
+				overflow: 'hidden',
 				borderBottom: 'solid ' + TimelineBlockHeight / 20 + 'px #ccc'
 			}
 		};
