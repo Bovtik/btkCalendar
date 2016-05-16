@@ -23,6 +23,6 @@ server.get('/', function (req, res) {
   res.end("<!DOCTYPE html>" + html);
 });
 
-server.listen(80);
+server.listen('80', '127.0.0.1');
 
 console.log('Server running at http://localhost:80/');
