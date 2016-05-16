@@ -483,13 +483,18 @@ var PopupForm = React.createClass({
 		= dur.style.borderColor 
 		= '#999';
 
+		var durArr = dur.value.replace(/:/g, '.')
+													.split('.');
+		var duration = (+durArr[0] * 60 + +durArr[1]) * 60 * 1000;
+
 	if (!title.value.match(/^.{1,45}$/)) {
 		title.style.borderColor = 'red';
 	} else if (!date.value.match(/^\d{2}[.]\d{2}[.]\d{4}$/)) {
 		date.style.borderColor = 'red';
 	} else if (!time.value.match(/^\d{1,2}[:]\d{1,2}$/)) {
 		time.style.borderColor = 'red';
-	} else if (!dur.value.match(/^\d{1,2}[:|.]\d{1,2}$/)) {
+	} else if (!dur.value.match(/^\d{1,2}[:|.]\d{1,2}$/)
+						 || (duration < constants.msInHour || duration > constants.msInHour * 24)) {
 		dur.style.borderColor = 'red';
 	} else {
 			var dateArr = date.value.split('.'),
@@ -498,13 +503,10 @@ var PopupForm = React.createClass({
 			var start = new Date (dateArr[2], dateArr[1] - 1, dateArr[0],
 														timeArr[0], timeArr[1], 0, 0);
 
-			var durArr =	dur.value.replace(/:/g, '.')
-																					.split('.');
-
 			var cEvData = {
 				title: title.value,
 				start: start,
-				duration: (+durArr[0] * 60 + +durArr[1]) * 60 * 1000
+				duration: duration
 			};
 			AppActions.addCEvent(cEvData);
 			setTimeout( function () {		// UX - not an instant, sudden form vanishing
@@ -528,7 +530,11 @@ var PopupForm = React.createClass({
 							<input ref="inpDate" placeholder="Date (dd.mm.yyyy)" type="text" style={this.state.textInputStyle}/>
 							<input ref="inpTime" placeholder="Time (hh:mm)" type="text" style={this.state.textInputStyle}/>
 							<input ref="inpDur" placeholder="Duration (hh.mm / hh:mm)" type="text" style={this.state.textInputStyle}/>
-							<div style={this.state.tipStyle}>{'Check the input boxes placeholders for rules of input'}</div>
+							<div style={this.state.tipStyle}>
+								{'Check the input boxes placeholders for rules of input'}
+									<br/>
+								{'Duration has to be between 1 and 24 hours long'}
+							</div>
 							<FormSubmitButton onClick={this.handleSubmit}/>
 						</form>
 	},
