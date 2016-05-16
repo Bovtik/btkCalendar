@@ -1,9 +1,0 @@
-<style>
-	#Timeline div::after {
-		content: '';
-		display: block;
-		width: 100%;
-		height: 2px;
-		background: #ddd;
-	}
-</style>
