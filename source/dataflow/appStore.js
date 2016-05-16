@@ -63,9 +63,7 @@ var AppStore = assign({}, EventEmitter.prototype, {
 AppDispatcher.register( function (payload) {
 	switch (payload.action.actionType) {
 		case AppConstants.ADD_C_EVENT:
-			console.log(AppStore.getAll());
 			AppStore.addCEvent(payload.action.data);
-			// console.log(payload.action.data);
 			AppStore.emitChange();
 			break;
 		case AppConstants.REMOVE_C_EVENT:
