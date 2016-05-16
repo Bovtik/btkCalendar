@@ -283,17 +283,20 @@ var CEventBlock = React.createClass({
 		return {
 			data: this.props.data,
 			style: {
+				width: '98%',
+				margin: '0 1% 0 1%',
 				position: 'absolute',
-				height: TimelineBlockHeight * (data.duration / 3600000) + 'px', // 36*10^5ms = 1h
-				padding: '10px',
-				backgroundColor: '#33e',
+				top: (2 + TimelineBlockHeight) * (this.props.data.start.getHours() + this.props.data.start.getMinutes() / 60) - 1 + 'px',
+				height: (2 + TimelineBlockHeight) * (this.props.data.duration / 3600000) + 'px', // 36*10^5ms = 1h
+				backgroundColor: '#88e',
 				borderRadius: '5px',
+				boxShadow: '1px 1px 2px #aaa',
 				overflow: 'hidden'
 			},
 			titleStyle: {
-				fontSize: '1em',
-				color: '#fff',
-				lineHeight: '2em'
+				margin: '10px',
+				fontSize: '1.2em',
+				color: '#fff'
 			}
 		};
 	},
@@ -336,14 +339,21 @@ var DayBlock = React.createClass({
 				padding: '0 15px 0 15px',
 				textAlign: 'right',
 				color: '#fff'
-			},
-			date: this.props.date,
-			CEvents: AppStore.getCEventsByDate(this.props.date)
+			}
 		};
+	},
+
+	componentDidMount: function () {
+		AppStore.addChangeListener(this._onChange);
+	},
+	componentWillUnmount: function () {
+		AppStore.removeChangeListener(this._onChange);
 	},
 
 	render: function () {
 		var dayTitle = this.props.date.getMonthShortName() + ', ' + this.props.date.getDate();
+
+		var curCEvents = AppStore.getCEventsByDate(this.props.date);
 
 		return React.createElement(
 			'div',
@@ -353,8 +363,17 @@ var DayBlock = React.createClass({
 				{ style: this.state.titleStyle },
 				dayTitle
 			),
-			React.createElement('div', { style: this.state.style })
+			React.createElement('div', { style: this.state.style }),
+			curCEvents.map(function (item, i) {
+				return React.createElement(CEventBlock, { data: item, key: item.id });
+			})
 		);
+	},
+
+	_onChange: function () {
+		this.setState({
+			CEvents: AppStore.getCEventsByDate(this.props.date)
+		});
 	}
 });
 
@@ -508,11 +527,15 @@ var PopupForm = React.createClass({
 
 		var dateArr = this.refs.inpDate.value.split('.'),
 		    timeArr = this.refs.inpTime.value.split(':');
+
 		var start = new Date(dateArr[2], dateArr[1] - 1, dateArr[0], timeArr[0], timeArr[1], 0, 0);
+
+		var durArr = this.refs.inpDur.value.replace(/:/g, '.').split('.');
+
 		var cEvData = {
 			title: this.refs.inpTitle.value,
 			start: start,
-			duration: +this.refs.inpDur.value
+			duration: (+durArr[0] * 60 + +durArr[1]) * 60 * 1000
 		};
 		AppActions.addCEvent(cEvData);
 		setTimeout(function () {

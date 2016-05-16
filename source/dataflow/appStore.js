@@ -20,10 +20,10 @@ var AppStore = assign({}, EventEmitter.prototype, {
   getCEventsByDate: function (date) {
   	var evArray = [];
   	mainStorage.CEvents.forEach(function (item, i, arr) {
-  		if (item.start.getDate() == date.getDate() &&
-  				item.start.getMonth() == date.getMonth() &&
-  				item.start.getFullYear() == date.getFullYear())
-  			evArray.push[item];
+  		if (item.start.getDate() === date.getDate() &&
+  				item.start.getMonth() === date.getMonth() &&
+  				item.start.getFullYear() === date.getFullYear())
+  			evArray.push(item);
   	});
   	return evArray;
   },
