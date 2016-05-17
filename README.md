@@ -6,8 +6,8 @@ You can pass the port and ip-adress as arguments to 'npm start', the defaults ar
 
 ## Using
 Press the button with '+' in top left corner to add create an event -- a popup form will be provided, where you can input event info. Fields with incorrect values (according to input rules) will have a red border. When you're done, simply click the 'Create' button to add an event to calendar.
-Click 'x' button in the top right corner of event block to remove the event from calendar.
-You can use '<' and '>' buttons to scroll between days.
+Click the 'x' button in the top right corner of event block to remove the event from calendar.
+You can also use '<' and '>' buttons to scroll between days.
 
 ## Demo 
 This app is hosted on Heroku, directly from this repository:
